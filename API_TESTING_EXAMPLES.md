@@ -8,14 +8,80 @@ First, login to get an access token:
 curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "identifier": "admin",
-    "password": "password"
+    "identifier": "rajesh_admin",
+    "password": "hashed_pw"
   }'
 ```
 
 Use the returned `accessToken` in the Authorization header for subsequent requests:
 ```
 Authorization: Bearer <your-access-token>
+```
+
+## User Management APIs
+
+### 1. Get Current User Profile
+```bash
+curl -X GET http://localhost:8080/api/v1/auth/me \
+  -H "Authorization: Bearer <your-token>"
+```
+
+### 2. Get All Users (Admin only)
+```bash
+# Get all users
+curl -X GET http://localhost:8080/api/v1/admin/users \
+  -H "Authorization: Bearer <your-token>"
+
+# Filter by role
+curl -X GET "http://localhost:8080/api/v1/admin/users?role=employee" \
+  -H "Authorization: Bearer <your-token>"
+
+# Filter by username
+curl -X GET "http://localhost:8080/api/v1/admin/users?username=anita" \
+  -H "Authorization: Bearer <your-token>"
+
+# Pagination
+curl -X GET "http://localhost:8080/api/v1/admin/users?page=0&size=5" \
+  -H "Authorization: Bearer <your-token>"
+```
+
+### 3. Get User by ID
+```bash
+curl -X GET http://localhost:8080/api/v1/admin/users/2 \
+  -H "Authorization: Bearer <your-token>"
+```
+
+### 4. Create User
+```bash
+curl -X POST http://localhost:8080/api/v1/admin/users \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "test_user",
+    "email": "test.user@company.com",
+    "password": "password123",
+    "fullName": "Test User",
+    "role": "employee",
+    "employeeId": "2"
+  }'
+```
+
+### 5. Update User
+```bash
+curl -X PUT http://localhost:8080/api/v1/admin/users/2 \
+  -H "Authorization: Bearer <your-token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullName": "Anita Sharma Updated",
+    "role": "line_manager",
+    "isActive": true
+  }'
+```
+
+### 6. Deactivate User (Admin only)
+```bash
+curl -X DELETE http://localhost:8080/api/v1/admin/users/2 \
+  -H "Authorization: Bearer <your-token>"
 ```
 
 ## Employee Management APIs
@@ -44,23 +110,23 @@ curl -X POST http://localhost:8080/api/v1/employees \
   -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "empCode": "EMP001",
-    "firstName": "John",
-    "lastName": "Doe",
+    "empCode": "E1006",
+    "firstName": "Ravi",
+    "lastName": "Kumar",
     "gender": "Male",
-    "dob": "1990-01-15",
-    "dateOfJoining": "2023-01-01",
-    "employmentType": "Full-time",
+    "dob": "1992-03-20",
+    "dateOfJoining": "2024-01-15",
+    "employmentType": "permanent",
     "locationId": 1,
     "businessUnitId": 1,
     "levelId": 1,
     "subLevel": "A",
     "designationId": 1,
     "jobFamilyId": 1,
-    "email": "john.doe@company.com",
+    "email": "ravi.kumar@company.com",
     "phone": "+1234567890",
     "permanentWfh": false,
-    "status": "Active"
+    "status": "active"
   }'
 ```
 
@@ -70,9 +136,9 @@ curl -X PUT http://localhost:8080/api/v1/employees/1 \
   -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "firstName": "John Updated",
-    "email": "john.updated@company.com",
-    "status": "Active"
+    "firstName": "Rajesh Updated",
+    "email": "rajesh.updated@company.com",
+    "status": "active"
   }'
 ```
 
@@ -108,16 +174,16 @@ curl -X POST http://localhost:8080/api/v1/candidates \
   -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "candidateName": "Jane Smith",
-    "candidateEmail": "jane.smith@email.com",
-    "candidatePhone": "+1234567890",
-    "appliedDate": "2024-01-15",
-    "appliedPosition": "Software Engineer",
+    "candidateName": "Rohit Sharma",
+    "candidateEmail": "rohit.sharma@email.com",
+    "candidatePhone": "+9876543210",
+    "appliedDate": "2024-07-15",
+    "appliedPosition": "Senior Software Engineer",
     "sourceId": 1,
-    "recruiterUserId": 1,
+    "recruiterUserId": 4,
     "status": "applied",
-    "experienceYears": 3.5,
-    "candidateExperienceScore": 8.5
+    "experienceYears": 5.0,
+    "candidateExperienceScore": 4.2
   }'
 ```
 
@@ -147,14 +213,14 @@ curl -X POST http://localhost:8080/api/v1/performance-reviews \
   -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "employeeId": 1,
-    "reviewerId": 2,
+    "employeeId": 2,
+    "reviewerId": 1,
     "reviewPeriodStart": "2024-01-01",
     "reviewPeriodEnd": "2024-06-30",
     "reviewDate": "2024-07-15",
-    "score": 4.2,
+    "score": 4.5,
     "ratingScale": "1-5",
-    "comments": "Excellent performance with room for improvement in leadership skills."
+    "comments": "Outstanding performance, excellent technical skills and team collaboration."
   }'
 ```
 
@@ -184,13 +250,13 @@ curl -X POST http://localhost:8080/api/v1/performance-improvement-plans \
   -H "Authorization: Bearer <your-token>" \
   -H "Content-Type: application/json" \
   -d '{
-    "employeeId": 1,
+    "employeeId": 3,
     "startDate": "2024-01-01",
     "endDate": "2024-03-31",
-    "objectives": "Improve communication skills and project delivery timelines",
-    "actions": "1. Attend communication workshop 2. Weekly check-ins with manager 3. Complete projects on time",
+    "objectives": "Improve reporting accuracy and timeliness",
+    "actions": "1. Weekly review meetings 2. Use reporting templates 3. Double-check all calculations",
     "status": "open",
-    "notes": "Employee shows willingness to improve"
+    "notes": "Monitor progress closely, provide additional support as needed"
   }'
 ```
 
@@ -215,11 +281,11 @@ curl -X POST http://localhost:8080/api/v1/recruitment-metrics \
   -H "Content-Type: application/json" \
   -d '{
     "recruitmentChannelId": 1,
-    "metricDate": "2024-01-31",
-    "costSpent": 5000.00,
-    "hiresCount": 3,
-    "avgTimeToHireDays": 25.5,
-    "metadata": "{\"campaign\": \"Q1-2024\", \"region\": \"North\"}"
+    "metricDate": "2024-07-31",
+    "costSpent": 25000.00,
+    "hiresCount": 2,
+    "avgTimeToHireDays": 28.0,
+    "metadata": "{\"campaign\": \"Q3-2024\", \"region\": \"APAC\"}"
   }'
 ```
 
@@ -281,38 +347,83 @@ curl -X GET http://localhost:8080/api/v1/health
 ```json
 {
   "id": 1,
-  "empCode": "EMP001",
-  "firstName": "John",
-  "lastName": "Doe",
+  "empCode": "E1001",
+  "firstName": "Rajesh",
+  "lastName": "Kumar",
   "gender": "Male",
-  "dob": "1990-01-15",
-  "dateOfJoining": "2023-01-01",
-  "employmentType": "Full-time",
-  "locationCity": "New York",
-  "businessUnitName": "Engineering",
-  "levelName": "Senior",
-  "subLevel": "A",
-  "designationTitle": "Software Engineer",
-  "jobFamilyName": "Technology",
-  "managerName": "Jane Manager",
-  "email": "john.doe@company.com",
-  "phone": "+1234567890",
+  "dob": "1985-06-15",
+  "dateOfJoining": "2015-04-01",
+  "employmentType": "permanent",
+  "locationCity": "Bangalore",
+  "businessUnitName": "Technology",
+  "levelName": "L3",
+  "subLevel": "C",
+  "designationTitle": "Senior Software Engineer",
+  "jobFamilyName": "Engineering",
+  "managerName": null,
+  "email": "rajesh.kumar@company.com",
+  "phone": "9876543210",
   "permanentWfh": false,
-  "status": "Active",
-  "createdAt": "2024-01-01T10:00:00Z",
-  "updatedAt": "2024-01-01T10:00:00Z"
+  "status": "active",
+  "createdAt": "2025-09-01T00:00:00Z",
+  "updatedAt": "2025-09-01T00:00:00Z"
 }
 ```
+
+### User Response
+```json
+{
+  "id": 1,
+  "username": "rajesh_admin",
+  "email": "rajesh.kumar@company.com",
+  "fullName": "Rajesh Kumar",
+  "role": "ADMIN",
+  "employeeId": 1,
+  "employeeCode": "E1001",
+  "employeeName": "Rajesh Kumar",
+  "isActive": true,
+  "lastLoginAt": "2025-09-01T00:00:00Z",
+  "createdAt": "2025-09-01T00:00:00Z"
+}
+```
+
+### Sample Login Credentials
+Based on the sample data, you can use these credentials for testing:
+
+**Admin User:**
+- Username: `rajesh_admin`
+- Password: `hashed_pw`
+- Role: ADMIN
+
+**HR Admin:**
+- Username: `meena_hr`
+- Password: `hashed_pw`
+- Role: HR_ADMIN
+
+**Line Manager:**
+- Username: `arjun_lead`
+- Password: `hashed_pw`
+- Role: LINE_MANAGER
+
+**BU Lead:**
+- Username: `amit_sales`
+- Password: `hashed_pw`
+- Role: BU_LEAD
+
+**Employee:**
+- Username: `anita_emp`
+- Password: `hashed_pw`
+- Role: EMPLOYEE
 
 ### Dashboard Stats Response
 ```json
 {
-  "totalEmployees": 150,
-  "totalCandidates": 45,
-  "activeCandidates": 23,
-  "hiredCandidates": 12,
-  "totalPerformanceReviews": 89,
-  "activePIPs": 5
+  "totalEmployees": 12,
+  "totalCandidates": 4,
+  "activeCandidates": 2,
+  "hiredCandidates": 2,
+  "totalPerformanceReviews": 5,
+  "activePIPs": 1
 }
 ```
 
@@ -333,3 +444,6 @@ curl -X GET http://localhost:8080/api/v1/health
 - DateTime format: `YYYY-MM-DDTHH:mm:ssZ` (ISO 8601 with timezone)
 - All monetary values are in decimal format
 - Boolean values: `true` or `false`
+- User passwords in sample data are stored as `hashed_pw` (use NoOpPasswordEncoder for testing)
+- Pagination: Use `page` (0-based) and `size` parameters for paginated endpoints
+- Soft delete: Users are deactivated (isActive=false) rather than physically deleted
