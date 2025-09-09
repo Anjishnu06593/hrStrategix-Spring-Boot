@@ -2,20 +2,21 @@ package com.example.hrStrategix.controller;
 
 import com.example.hrStrategix.dto.LoginRequest;
 import com.example.hrStrategix.dto.LoginResponse;
+import com.example.hrStrategix.dto.UserResponse;
 import com.example.hrStrategix.entity.User;
 import com.example.hrStrategix.service.AuthService;
+import com.example.hrStrategix.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
+    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
@@ -41,5 +42,11 @@ public class AuthController {
                 .build();
 
         return ResponseEntity.ok(resp);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal User currentUser) {
+        UserResponse userProfile = userService.getCurrentUserProfile(currentUser);
+        return ResponseEntity.ok(userProfile);
     }
 }
