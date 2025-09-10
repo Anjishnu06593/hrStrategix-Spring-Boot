@@ -118,29 +118,33 @@ public class AuthController {
             )
         )
         @RequestBody LoginRequest req) {
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
-        User user = authService.authenticate(req.getIdentifier(), req.getPassword());
-        String token = authService.issueToken(user);
+        try {
+            User user = authService.authenticate(req.getIdentifier(), req.getPassword());
+            String token = authService.issueToken(user);
 
-        LoginResponse.UserInfo info = new LoginResponse.UserInfo();
-        info.setId(user.getId());
-        info.setUsername(user.getUsername());
-        info.setFullName(user.getFullName());
-        info.setEmail(user.getEmail());
-        info.setRole(user.getRole().name());
-        if (user.getEmployee() != null) {
-            info.setEmployeeId(user.getEmployee().getId());
-            info.setEmployeeCode(user.getEmployee().getEmpCode());
+            LoginResponse.UserInfo info = new LoginResponse.UserInfo();
+            info.setId(user.getId());
+            info.setUsername(user.getUsername());
+            info.setFullName(user.getFullName());
+            info.setEmail(user.getEmail());
+            info.setRole(user.getRole().name());
+            if (user.getEmployee() != null) {
+                info.setEmployeeId(user.getEmployee().getId());
+                info.setEmployeeCode(user.getEmployee().getEmpCode());
+            }
+
+            LoginResponse resp = LoginResponse.builder()
+                    .accessToken(token)
+                    .tokenType("bearer")
+                    .expiresIn(authService.getJwtExpirationMs())
+                    .user(info)
+                    .build();
+
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            System.err.println("Login error: " + e.getMessage());
+            throw e; // Let the global exception handler deal with it
         }
-
-        LoginResponse resp = LoginResponse.builder()
-                .accessToken(token)
-                .tokenType("bearer")
-                .expiresIn(authService.getJwtExpirationMs())
-                .user(info)
-                .build();
-
-        return ResponseEntity.ok(resp);
     }
 
     @GetMapping("/me")
